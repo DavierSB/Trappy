@@ -75,6 +75,13 @@ class Packet:
         )
         return tcp_header
     
+    def get_tcp_checksum(self):
+        checksum = self.tcp_check
+        self.update(tcp_check=0)
+        tcp_header = self.build_tcp_header()
+        self.tcp_check = checksum
+        return utils.make_checksum(tcp_header + self.data)
+
     def build_ip_header(self):
         ip_header = pack(
             "!BBHHHBBH4s4s", 
@@ -90,19 +97,21 @@ class Packet:
             self.ip_dest_host.encode(),
         )
         return ip_header
-
-    def build(self):
-        self._refresh()
         
-        self.update(tcp_check=0)
-        tcp_header = self.build_tcp_header()
-        checksum = utils.make_checksum(tcp_header + self.data)
+    def get_ip_checksum(self):
+        checksum = self._ip_check
+        self.update(_ip_check=0)
+        ip_header = self.build_ip_header()
+        self._ip_check = checksum
+        return utils.make_checksum(ip_header)
+        
+    def build(self):
+        
+        checksum = self.get_tcp_checksum
         self.update(tcp_check=checksum)
         tcp_header = self.build_tcp_header()
         
-        self.update(_ip_check=0)
-        ip_header = self.build_ip_header()
-        checksum = utils.make_checksum(ip_header)
+        checksum = self.get_ip_checksum
         self.update(_ip_check=checksum)
         ip_header = self.build_ip_header()
         
@@ -142,11 +151,5 @@ class Packet:
         if (data != None): self.data = data
 
     def corrupted(self):
-        checksum = self.tcp_check
-        self.update(tcp_check=0)
-        tcp_header = self.build_tcp_header()
-        self.tcp_check = utils.make_checksum(tcp_header)
-        if (self.tcp_check == checksum): return True
-        else:
-            self.tcp_check = checksum
-            return False
+        checksum = self.get_tcp_checksum()
+        return self.tcp_check == checksum
