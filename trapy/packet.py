@@ -141,7 +141,7 @@ class Packet:
         
         if (data != None): self.data = data
 
-    def cprrupted(self):
+    def corrupted(self):
         checksum = self.tcp_check
         self.update(tcp_check=0)
         tcp_header = self.build_tcp_header()
