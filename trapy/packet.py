@@ -36,11 +36,11 @@ class Packet:
         self.data = b'\x00\x00'
     
     def get(self, packet_from_raw):
-        self.ip_header = unpack("!BBHHHBBH4s4s", packet_from_raw[0:20]) 
+        self._ip_header = unpack("!BBHHHBBH4s4s", packet_from_raw[0:20]) 
         
         self._ip_check = self._ip_header[7]
-        self.source_host = self.ip_header[8]
-        self.dest_host = self.ip_header[9]
+        self.source_host = self._ip_header[8]
+        self.dest_host = self._ip_header[9]
         
         self.tcp_source_port, self.tcp_dest_port, self.tcp_seq_num, self.tcp_ack_num, self.tcp_offset_res, self.tcp_flags, self.tcp_window, self.tcp_check, self.tcp_urg_ptr, = unpack("!HHLLBBHHH", packet_from_raw[20:40])
         
@@ -107,13 +107,16 @@ class Packet:
         
     def build(self):
         
-        checksum = self.get_tcp_checksum
+        checksum = self.get_tcp_checksum()
         self.update(tcp_check=checksum)
         tcp_header = self.build_tcp_header()
         
-        checksum = self.get_ip_checksum
+        self._ip_header[2] = 40 + len(self.data) #Total length
+        checksum = self.get_ip_checksum()
         self.update(_ip_check=checksum)
         ip_header = self.build_ip_header()
+        
+        
         
         return ip_header + tcp_header + self.data
 
@@ -123,7 +126,7 @@ class Packet:
         tcp_seq_num = None,
         tcp_ack_num = None,
         tcp_offset_res = None,        
-        tcp_flags = 0,
+        tcp_flags = None,
         tcp_window = None,
         tcp_check = None,
         tcp_urg_ptr = None,
@@ -139,7 +142,7 @@ class Packet:
         if (tcp_seq_num != None): self.tcp_seq_num = tcp_seq_num
         if (tcp_ack_num != None): self.tcp_ack_num = tcp_ack_num
         if (tcp_offset_res != None): self.tcp_offset_res = tcp_offset_res
-        if (tcp_flags != 0): self.tcp_flags = tcp_flags
+        if (tcp_flags != None): self.tcp_flags = tcp_flags
         if (tcp_window != None): self.tcp_window = tcp_window
         if (tcp_check != None): self.tcp_check = tcp_check
         if (tcp_urg_ptr != None): self.tcp_urg_ptr = tcp_urg_ptr
