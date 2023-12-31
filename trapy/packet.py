@@ -140,3 +140,13 @@ class Packet:
         if (ip_dest_host != None): self.ip_dest_host = ip_dest_host
         
         if (data != None): self.data = data
+
+    def cprrupted(self):
+        checksum = self.tcp_check
+        self.update(tcp_check=0)
+        tcp_header = self.build_tcp_header()
+        self.tcp_check = utils.make_checksum(tcp_header)
+        if (self.tcp_check == checksum): return True
+        else:
+            self.tcp_check = checksum
+            return False
