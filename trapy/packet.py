@@ -5,7 +5,7 @@ import utils
 
 class Packet:
     def __init__(self):
-        
+                
         self.source_ip = '127.0.0.1'
         self.dest_ip = '127.0.0.1'
         
@@ -26,7 +26,7 @@ class Packet:
         
         self.tcp_source_port = 0
         self.tcp_dest_port = 0
-        self.tcp_seq_num = 0
+        self.tcp_seq_num = random.randint(2**32)
         self.tcp_ack_num = 0        
         self.tcp_offset_res = 5
         # self.tcp_flag_syn = 0
@@ -35,8 +35,8 @@ class Packet:
         # self.tcp_flag_psh = 0
         # self.tcp_flag_urg = 0
         # self.tcp_flag_fin = 0        
-        self.tcp_flags = 0        
-        self.tcp_window = 0
+        self.tcp_flags = 2        
+        self.tcp_window = 2**16
         self.tcp_checksum = 0
         self.tcp_urg_ptr = 0
         

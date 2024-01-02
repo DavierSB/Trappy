@@ -24,9 +24,6 @@ def get_free_port() -> int:
     sock.close()
     return port
 
-def corrupted(data, checksum):
-    return checksum == make_checksum(data)
-
 def fragment_data(data: bytes, max_data_size: int):
     fragmented_data = []
     fd_size = 0
