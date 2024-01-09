@@ -19,7 +19,6 @@ def receive_sync(conn : Conn):
     conn.seq_num = randint(1, 1000)
     conn.set_destination(sync_packet.source_ip, sync_packet.tcp_source_port)
     print("RECEIVED SYNC")
-    return sync_packet
 
 def finish_handshake(conn: Conn):
     sync_ack_packet = create_packet_for_send(conn, sync= True, ack= True)

@@ -9,7 +9,7 @@ def listen(address: str) -> Conn:
     return conn
 
 def accept(conn) -> Conn:
-    syn_pack = receive_sync(conn)
+    receive_sync(conn)
     finish_handshake(conn)
     return conn
 
